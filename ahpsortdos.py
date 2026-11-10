@@ -24,3 +24,12 @@ def prioridad_local(valor: float, puntos: list[tuple[float, float]]) -> float:
             return interpolar(valor, punto_bajo, punto_alto)
 
     return -1
+
+#calcula prioridad global agregando usando los pesos
+def prioridad_global(prioridades: list[float], pesos: list[float]) -> float:
+    total = 0.0
+
+    for i in range(len(pesos)):
+        total += prioridades[i]*pesos[i]
+
+    return total
