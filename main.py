@@ -1,5 +1,5 @@
 from ahp import media_geometrica, test_consistencia
-from ahpsortdos import prioridad_global
+from ahpsortdos import prioridad_global, prioridad_local
 
 
 def main():
@@ -39,8 +39,36 @@ def main():
     expertos_pares_vehiculos = [(0, 0.459), (5000, 0.138), (7025.4, 0.124), (14050.8, 0.069), (19000, 0.063), (21076.2, 0.048), (27000, 0.04), (28101.6, 0.034), (35127, 0.026)]
     expertos_pares_orden_publico = [(0, 0.308), (300, 0.259), (764.8, 0.149), (1529.6, 0.071), (1800, 0.066), (2294.4, 0.06), (2500, 0.034), (3059.2, 0.032), (3824, 0.023)]
     expertos_pares_drogas = [(0, 0.385), (300, 0.262), (321.6, 0.112), (600, 0.07), (643.2, 0.062), (900, 0.035), (964.8, 0.033), (1286.4, 0.023), (1608, 0.018)]
+    lista_global_expertos=[expertos_pares_crimenes, expertos_pares_robos, expertos_pares_vehiculos, expertos_pares_orden_publico, expertos_pares_drogas]
 
-    
+    provincias = {"Almería": [23, 17284, 2101, 387, 267],
+                "Cádiz": [61, 26571, 3945, 722, 818],
+                "Córdoba": [20, 14508, 1691, 219, 148],
+                "Granada": [32, 19139, 2299, 368, 622],
+                "Huelva": [8, 11222, 1409, 156, 139],
+                "Jaén": [17, 7548, 718, 175, 129],
+                "Málaga": [58, 46137, 6377, 830, 934],
+                "Sevilla": [86, 52849, 9662, 716, 415]}
+
+    #calculamos las prioridades globales de cada provincia
+    for provincia, valores in provincias.items():#para cada provincia
+        prioridades = []
+
+        for i in range(len(valores)):#para cada criterio
+            prioridad = prioridad_local(valores[i], lista_global_expertos[i])#calculo la prioridad local usando los puntos de referencia de los expertos
+            prioridades.append(prioridad)
+
+        puntuacion = prioridad_global(prioridades, pesos)#calculo la prioridad global usando los pesos de los criterios
+
+        if puntuacion >= limite_alta_media:
+            clase = "Alta"
+        elif puntuacion >= limite_media_baja:
+            clase = "Media"
+        else:
+            clase = "Baja"
+
+        print(provincia, round(puntuacion, 4), clase)
+
 
 if __name__ == "__main__":
     main()
