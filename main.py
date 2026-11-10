@@ -17,6 +17,7 @@ def main():
 
     print("Pesos:", pesos)
     print("CR:", test["CR"], "Aceptable?:", test["aceptable"])
+    print()
 
     #ahora calculo las prioridades globales de los perfiles centrales
     cp1 = [0.277, 0.261, 0.138, 0.259, 0.262]
@@ -30,6 +31,7 @@ def main():
     print("Prioridad global cp1:", prioridad_global_cp1)
     print("Prioridad global cp2:", prioridad_global_cp2)
     print("Prioridad global cp3:", prioridad_global_cp3)
+    print()
 
     limite_alta_media = (prioridad_global_cp1 + prioridad_global_cp2) / 2
     limite_media_baja = (prioridad_global_cp2 + prioridad_global_cp3) / 2
@@ -68,6 +70,9 @@ def main():
             clase = "Baja"
 
         print(provincia, round(puntuacion, 4), clase)
+    print()
+
+    print("Ejercicio 2")
 
 
 if __name__ == "__main__":
