@@ -165,5 +165,43 @@ def main():
     print("Baja:", cont_baja)
     print()
 
+    #repetimos con los datos del excel de 2023
+    print("Ejercicio 4")
+    #primero cargo los datos del excel a un diccionario
+    archivo = load_workbook("Datos_nacionales_2023_por_10000_ES.xlsx", data_only=True)
+    hoja = archivo["Datos 2023"]
+
+    provincias_2023 = {}
+    for fila in hoja.iter_rows(min_row=2, values_only=True):#para cada fila
+        provincia = fila[0]
+
+        #Igualo nombres como "Palmas, Las" y "Palmas (Las)"
+        if ", " in provincia:
+            partes = provincia.split(", ")
+            provincia = partes[0] + " (" + partes[1] + ")"
+
+        valores = list(fila[7:12])#solo tomamos los normalizados por poblacion
+        provincias_2023[provincia] = valores
+    archivo.close()
+
+    #calculamos las prioridades y clasificamos las provincias de 2023 usando los mismos pr de los expertos y los mismos perfiles centrales que ej3
+    resultados_2023 = calcular_provincias(provincias_2023, expertos_pares_ej3, pesos)
+    clasificacion_2023 = clasificar_provincias(lista_cps_ej3, resultados_2023)
+    for provincia, resultado in clasificacion_2023.items():
+        print(provincia, round(resultado[0], 4), resultado[1])
+
+    
+    #comparamos la clasificacion de 2017 y 2023 para ver si ha cambiado
+    print()
+    print("Comparativa de clasificaciones entre 2017 y 2023")
+    print("Provincia | Seguridad 2017 | Seguridad 2023")
+
+    for provincia, resultado in clasificacion_2017.items():
+        grupo_2017 = resultado[1]
+        grupo_2023 = clasificacion_2023[provincia][1]
+        print(provincia, "|", grupo_2017, "|", grupo_2023)
+
+
+
 if __name__ == "__main__":
     main()
