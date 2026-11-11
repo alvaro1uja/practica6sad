@@ -61,6 +61,7 @@ def main():
     
 
     #ahora repetir pero con los datos normalizados por los habitantes de cada provincia
+    print()
     print("Ejercicio 2")
     habitantes = {
                 "Almeria": 731792,
@@ -142,10 +143,27 @@ def main():
     #ahora calculamos las prioridades globales de cada provincia de nuevo
     resultados_2017 = calcular_provincias(provincias_espana, expertos_pares_ej3, pesos)
     clasificacion_2017 = clasificar_provincias(lista_cps_ej3, resultados_2017)
-    
+
+    cont_alta=0
+    cont_media=0
+    cont_baja=0
     print("Prioridades globales de cada provincia de España normalizadas por habitantes")
     for provincia, resultado in clasificacion_2017.items():
         print(provincia, round(resultado[0], 4), resultado[1])
+        if resultado[1]=="Alta":
+            cont_alta+=1
+        elif resultado[1]=="Media":
+            cont_media+=1
+        elif resultado[1]=="Baja":
+            cont_baja+=1
+
+    #contadores de cada grupo
+    print()
+    print("Contadores de cada grupo:")
+    print("Alta:", cont_alta)
+    print("Media:", cont_media)
+    print("Baja:", cont_baja)
+    print()
 
 if __name__ == "__main__":
     main()
