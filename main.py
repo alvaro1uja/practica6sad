@@ -1,6 +1,6 @@
 from ahp import media_geometrica, test_consistencia
-from ahpsortdos import prioridad_global, prioridad_local
-
+from ahpsortdos import prioridad_global, prioridad_local, calcular_provincias, clasificar_provincias
+from openpyxl import load_workbook
 
 def main():
     #Ejercicio 1: Calcular los pesos de los criterios y calcular validez (CR concistencia)
@@ -27,15 +27,14 @@ def main():
     prioridad_global_cp1 = prioridad_global(cp1, pesos)
     prioridad_global_cp2 = prioridad_global(cp2, pesos)
     prioridad_global_cp3 = prioridad_global(cp3, pesos)
+    lista_cps = [prioridad_global_cp1, prioridad_global_cp2, prioridad_global_cp3]
 
     print("Prioridad global cp1:", prioridad_global_cp1)
     print("Prioridad global cp2:", prioridad_global_cp2)
     print("Prioridad global cp3:", prioridad_global_cp3)
     print()
 
-    limite_alta_media = (prioridad_global_cp1 + prioridad_global_cp2) / 2
-    limite_media_baja = (prioridad_global_cp2 + prioridad_global_cp3) / 2
-
+    #ahora cargamos los pr de los expertos
     expertos_pares_crimenes = [(0, 0.336), (20, 0.277), (41.2, 0.132), (82.4, 0.086), (100, 0.058), (123.6, 0.032), (160, 0.029), (164.8, 0.026), (206, 0.023)]
     expertos_pares_robos = [(0, 0.32), (5000, 0.261), (50914.4, 0.139), (95000, 0.075), (101828.8, 0.074), (152743.2, 0.047), (180000, 0.032), (203657.6, 0.031), (254572, 0.022)]
     expertos_pares_vehiculos = [(0, 0.459), (5000, 0.138), (7025.4, 0.124), (14050.8, 0.069), (19000, 0.063), (21076.2, 0.048), (27000, 0.04), (28101.6, 0.034), (35127, 0.026)]
@@ -43,6 +42,7 @@ def main():
     expertos_pares_drogas = [(0, 0.385), (300, 0.262), (321.6, 0.112), (600, 0.07), (643.2, 0.062), (900, 0.035), (964.8, 0.033), (1286.4, 0.023), (1608, 0.018)]
     lista_global_expertos=[expertos_pares_crimenes, expertos_pares_robos, expertos_pares_vehiculos, expertos_pares_orden_publico, expertos_pares_drogas]
 
+    #cargamos los datos de las provincias
     provincias = {"Almeria": [23, 17284, 2101, 387, 267],
                 "Cadiz": [61, 26571, 3945, 722, 818],
                 "Cordoba": [20, 14508, 1691, 219, 148],
@@ -53,25 +53,12 @@ def main():
                 "Sevilla": [86, 52849, 9662, 716, 415]}
 
     #calculamos las prioridades globales de cada provincia
+    resultados = calcular_provincias(provincias, lista_global_expertos, pesos)
+    clasificacion = clasificar_provincias(lista_cps, resultados)
     print("Prioridades globales de cada provincia SIN NORMALIZAR POR HABITANTES")
-    for provincia, valores in provincias.items():#para cada provincia
-        prioridades = []
-
-        for i in range(len(valores)):#para cada criterio
-            prioridad = prioridad_local(valores[i], lista_global_expertos[i])#calculo la prioridad local usando los puntos de referencia de los expertos
-            prioridades.append(prioridad)
-
-        puntuacion = prioridad_global(prioridades, pesos)#calculo la prioridad global usando los pesos de los criterios
-
-        if puntuacion >= limite_alta_media:
-            clase = "Alta"
-        elif puntuacion >= limite_media_baja:
-            clase = "Media"
-        else:
-            clase = "Baja"
-
-        print(provincia, round(puntuacion, 4), clase)
-    print()
+    for provincia, resultado in clasificacion.items():
+        print(provincia, round(resultado[0], 4), resultado[1])
+    
 
     #ahora repetir pero con los datos normalizados por los habitantes de cada provincia
     print("Ejercicio 2")
@@ -93,13 +80,15 @@ def main():
             tasasnorm.append(tasaact)
         provincias_normalizadas[provincia] = tasasnorm
 
-    #introducimos los pr normalizados
+    #introducimos los pr de los expertos normalizados
     expertos_pares_crimenes_norm = [(0, 0.34), (0.10, 0.13), (0.20, 0.09), (0.26, 0.05), (0.30, 0.03), (0.34, 0.03), (0.39, 0.03), (0.41, 0.03), (0.49, 0.02)]
     expertos_pares_robos_norm = [(0, 0.32), (56.59, 0.14), (113.18, 0.07), (169.77, 0.05), (194.29, 0.04), (215.32, 0.03), (226.35, 0.03), (261.32, 0.03), (282.94, 0.02)]
     expertos_pares_vehiculos_norm = [(0, 0.46), (9.96, 0.12), (19.93, 0.07), (22.95, 0.06), (28.44, 0.05), (29.89, 0.05), (36.20, 0.04), (39.85, 0.03), (49.82, 0.03)]
     expertos_pares_orden_publico_norm = [(0, 0.31), (1.17, 0.15), (2.33, 0.07), (2.87, 0.07), (3.50, 0.06), (3.86, 0.05), (4.66, 0.03), (5.32, 0.03), (5.83, 0.02)]
     expertos_pares_drogas_norm = [(0, 0.39), (1.36, 0.11), (2.06, 0.09), (2.73, 0.06), (3.23, 0.05), (4.09, 0.03), (5.45, 0.02), (6.25, 0.02), (6.81, 0.02)]
     puntos_normalizados = [expertos_pares_crimenes_norm, expertos_pares_robos_norm, expertos_pares_vehiculos_norm, expertos_pares_orden_publico_norm, expertos_pares_drogas_norm]
+    
+    #cargamos los perfiles centrales normalizados
     cp1_norm = [0.05, 0.04, 0.06, 0.07, 0.09]
     cp2_norm = [0.03, 0.03, 0.05, 0.05, 0.05]
     cp3_norm = [0.03, 0.03, 0.04, 0.03, 0.02]
@@ -107,34 +96,56 @@ def main():
     global_cp1_norm = prioridad_global(cp1_norm, pesos)
     global_cp2_norm = prioridad_global(cp2_norm, pesos)
     global_cp3_norm = prioridad_global(cp3_norm, pesos)
-
-    limite_alta_media_norm = (global_cp1_norm + global_cp2_norm)/2
-    limite_media_baja_norm = (global_cp2_norm + global_cp3_norm)/2
-
+    lista_cps_norm = [global_cp1_norm, global_cp2_norm, global_cp3_norm]
 
     #calculamos las prioridades globales de cada provincia de nuevo
+    resultados_norm = calcular_provincias(provincias_normalizadas, puntos_normalizados, pesos)
+    clasificacion_norm = clasificar_provincias(lista_cps_norm, resultados_norm)
     print("Prioridades globales de cada provincia normalizadas por habitantes")
-    for provincia, valores in provincias_normalizadas.items():#para cada provincia
-        prioridades = []
-
-        for i in range(len(valores)):#para cada criterio
-            prioridad = prioridad_local(valores[i], puntos_normalizados[i])#calculo la prioridad local usando los puntos de referencia de los expertos
-            prioridades.append(prioridad)
-
-        puntuacion = prioridad_global(prioridades, pesos)#calculo la prioridad global usando los pesos de los criterios
-
-        if puntuacion >= limite_alta_media_norm:
-            clase = "Alta"
-        elif puntuacion >= limite_media_baja_norm:
-            clase = "Media"
-        else:
-            clase = "Baja"
-
-        print(provincia, round(puntuacion, 4), clase)
+    for provincia, resultado in clasificacion_norm.items():
+        print(provincia, round(resultado[0], 4), resultado[1])
     
     print()
-    print("Ejercicio 3")
 
+    #repetir el proceso pero ahora con los datos del excel de toda espana
+    print("Ejercicio 3")
+    #primero abrimos el excel y cargamos sus datos en un diccionario
+    archivo = load_workbook("Datos_nacionales_2017_por_10000_ES.xlsx", data_only=True)
+    hoja = archivo.active
+
+    provincias_espana = {}
+    for fila in hoja.iter_rows(min_row=2, values_only=True):
+        provincia = fila[0]
+        valores = list(fila[1:6])
+        provincias_espana[provincia] = valores
+
+    archivo.close()
+
+    #ahora cargamos los pr de los expertos
+    expertos_pares_crimenes_ej3 = [(0, 0.336), (0.15, 0.132), (0.30, 0.086), (0.44, 0.032), (0.59, 0.026), (0.74, 0.023)]
+    expertos_pares_robos_ej3 = [(0, 0.32), (81.29, 0.139), (162.59, 0.074), (243.88, 0.047), (325.17, 0.031), (406.46, 0.022)]
+    expertos_pares_vehiculos_ej3 = [(0, 0.459), (10.80, 0.124), (21.59, 0.069), (32.39, 0.048), (43.19, 0.034), (53.98, 0.026)]
+    expertos_pares_orden_publico_ej3 = [(0, 0.308), (1.18, 0.149), (2.35, 0.071), (3.53, 0.06), (4.70, 0.032), (5.88, 0.023)]
+    expertos_pares_drogas_ej3 = [(0, 0.385), (1.36, 0.112), (2.73, 0.062), (4.09, 0.033), (5.45, 0.023), (6.81, 0.018)]
+    expertos_pares_ej3 = [expertos_pares_crimenes_ej3, expertos_pares_robos_ej3, expertos_pares_vehiculos_ej3, expertos_pares_orden_publico_ej3, expertos_pares_drogas_ej3]
+
+    #ahora cargamos los perfiles centrales
+    cp1_ej3 = [0.125, 0.101, 0.229, 0.067, 0.109]
+    cp2_ej3 = [0.099, 0.068, 0.109, 0.061, 0.089]
+    cp3_ej3 = [0.061, 0.042, 0.051, 0.036, 0.061]
+
+    prglobal_cp1_ej3 = prioridad_global(cp1_ej3, pesos)
+    prglobal_cp2_ej3 = prioridad_global(cp2_ej3, pesos)
+    prglobal_cp3_ej3 = prioridad_global(cp3_ej3, pesos)
+    lista_cps_ej3 = [prglobal_cp1_ej3, prglobal_cp2_ej3, prglobal_cp3_ej3]
+
+    #ahora calculamos las prioridades globales de cada provincia de nuevo
+    resultados_2017 = calcular_provincias(provincias_espana, expertos_pares_ej3, pesos)
+    clasificacion_2017 = clasificar_provincias(lista_cps_ej3, resultados_2017)
+    
+    print("Prioridades globales de cada provincia de España normalizadas por habitantes")
+    for provincia, resultado in clasificacion_2017.items():
+        print(provincia, round(resultado[0], 4), resultado[1])
 
 if __name__ == "__main__":
     main()
