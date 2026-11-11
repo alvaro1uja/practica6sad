@@ -33,3 +33,50 @@ def prioridad_global(prioridades: list[float], pesos: list[float]) -> float:
         total += prioridades[i]*pesos[i]
 
     return total
+
+#dado un diccionario de provincias y sus valores, calcula la prioridad global de cada provincia usando los pr de los expertos y los pesos de los criterios
+def calcular_provincias(provincias: dict[str, list[float]], puntos_expertos: list[list[tuple[float, float]]], pesos: list[float]) -> dict[str, float]:
+    resultados = {}
+
+    for provincia, valores in provincias.items():#para cada provincia
+        prioridades = []
+
+        for i in range(len(valores)):#para cada criterio
+            valor = valores[i]
+
+            minimo = puntos_expertos[i][0][0]#valor minimo
+            maximo = puntos_expertos[i][-1][0]#valos maximo
+            if valor < minimo: #se trunca para que no sobrepase los limites
+                valor = minimo
+            elif valor > maximo:
+                valor = maximo
+
+            prioridad = prioridad_local(valor, puntos_expertos[i])
+            prioridades.append(prioridad)
+
+        puntuacion = prioridad_global(prioridades, pesos)
+
+        resultados[provincia] = puntuacion
+
+    return resultados
+
+#dado un diccionario de provincias y sus puntuaciones globales, clasifica cada provincia en alta, media o baja segun los limites dados
+def clasificar_provincias(prioridad_clases: list[float], resultados: dict[str, float]) -> dict[float, str]:
+    clases = ["Alta", "Media", "Baja"]
+    clasificacion = {}
+
+    limite_alta_media = (prioridad_clases[0] + prioridad_clases[1]) / 2
+    limite_media_baja = (prioridad_clases[1] + prioridad_clases[2]) / 2
+
+    for provincia, puntuacion in resultados.items():#para cada provincia
+
+        if puntuacion >= limite_alta_media:
+            grupo_actual = clases[0]
+        elif puntuacion >= limite_media_baja:
+            grupo_actual = clases[1]
+        else:
+            grupo_actual = clases[2]
+
+        clasificacion[provincia] = [puntuacion, grupo_actual]
+
+    return clasificacion
