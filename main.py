@@ -1,6 +1,7 @@
-from ahp import media_geometrica, test_consistencia
+from ahp import pesosporautovalor, test_consistencia
 from ahpsortdos import prioridad_global, prioridad_local, calcular_provincias, clasificar_provincias
 from openpyxl import load_workbook
+import csv
 
 def main():
     #Ejercicio 1: Calcular los pesos de los criterios y calcular validez (CR concistencia)
@@ -12,7 +13,7 @@ def main():
             [1/3, 1/3, 1, 1/5, 1/5],
             [1/7, 2, 5, 1, 1/5],
             [1/3, 4, 5, 5, 1]]
-    pesos = media_geometrica(matriz)
+    pesos = pesosporautovalor(matriz)
     test = test_consistencia(matriz)
 
     print("Pesos:", pesos)
