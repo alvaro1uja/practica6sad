@@ -1,5 +1,5 @@
 from ahp import pesosporautovalor, test_consistencia
-from ahpsortdos import prioridad_global, prioridad_local, calcular_provincias, clasificar_provincias
+from ahpsortdos import prioridad_global, prioridad_local, calcular_provincias, clasificar_provincias, mostrar_clasificacion
 from openpyxl import load_workbook
 import csv
 
@@ -147,26 +147,8 @@ def main():
     resultados_2017 = calcular_provincias(provincias_espana, expertos_pares_ej3, pesos)
     clasificacion_2017 = clasificar_provincias(lista_cps_ej3, resultados_2017)
 
-    cont_alta=0
-    cont_media=0
-    cont_baja=0
     print("Prioridades globales de cada provincia de España normalizadas por habitantes")
-    for provincia, resultado in clasificacion_2017.items():
-        print(provincia, round(resultado[0], 4), resultado[1])
-        if resultado[1]=="Alta":
-            cont_alta+=1
-        elif resultado[1]=="Media":
-            cont_media+=1
-        elif resultado[1]=="Baja":
-            cont_baja+=1
-
-    #contadores de cada grupo
-    print()
-    print("Contadores de cada grupo:")
-    print("Alta:", cont_alta)
-    print("Media:", cont_media)
-    print("Baja:", cont_baja)
-    print()
+    mostrar_clasificacion(clasificacion_2017)
 
     #Ejercicio 4
     #repetimos con los datos del excel de 2023
@@ -191,9 +173,7 @@ def main():
     #calculamos las prioridades y clasificamos las provincias de 2023 usando los mismos pr de los expertos y los mismos perfiles centrales que ej3
     resultados_2023 = calcular_provincias(provincias_2023, expertos_pares_ej3, pesos)
     clasificacion_2023 = clasificar_provincias(lista_cps_ej3, resultados_2023)
-    for provincia, resultado in clasificacion_2023.items():
-        print(provincia, round(resultado[0], 4), resultado[1])
-
+    mostrar_clasificacion(clasificacion_2023)
     
     #comparamos la clasificacion de 2017 y 2023 para ver si ha cambiado
     print()
