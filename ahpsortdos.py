@@ -61,7 +61,7 @@ def calcular_provincias(provincias: dict[str, list[float]], puntos_expertos: lis
     return resultados
 
 #dado un diccionario de provincias y sus puntuaciones globales, clasifica cada provincia en alta, media o baja segun los limites dados
-def clasificar_provincias(prioridad_clases: list[float], resultados: dict[str, float]) -> dict[float, str]:
+def clasificar_provincias(prioridad_clases: list[float], resultados: dict[str, float]) -> dict[str, list[float, str]]:
     clases = ["Alta", "Media", "Baja"]
     clasificacion = {}
 
@@ -80,3 +80,26 @@ def clasificar_provincias(prioridad_clases: list[float], resultados: dict[str, f
         clasificacion[provincia] = [puntuacion, grupo_actual]
 
     return clasificacion
+
+#muestra resumen del diccionario de clasificacion de provincias
+def mostrar_clasificacion(clasificacion: dict[str, list[float, str]]):
+    cont_alta = 0
+    cont_media = 0
+    cont_baja = 0
+
+    for provincia, resultado in clasificacion.items():
+        print(provincia, round(resultado[0], 4), resultado[1])
+
+        if resultado[1] == "Alta":
+            cont_alta += 1
+        elif resultado[1] == "Media":
+            cont_media += 1
+        elif resultado[1] == "Baja":
+            cont_baja += 1
+
+    print()
+    print("Contadores de cada grupo:")
+    print("Alta:", cont_alta)
+    print("Media:", cont_media)
+    print("Baja:", cont_baja)
+    print()
