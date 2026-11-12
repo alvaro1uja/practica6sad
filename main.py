@@ -61,6 +61,7 @@ def main():
         print(provincia, round(resultado[0], 4), resultado[1])
     
 
+    #Ejercicio 2
     #ahora repetir pero con los datos normalizados por los habitantes de cada provincia
     print()
     print("Ejercicio 2")
@@ -109,7 +110,8 @@ def main():
     
     print()
 
-    #repetir el proceso pero ahora con los datos del excel de toda espana
+    #Ejercicio 3
+    #repetir el proceso pero ahora con los datos del excel de toda espana 2017
     print("Ejercicio 3")
     #primero abrimos el excel y cargamos sus datos en un diccionario
     archivo = load_workbook("Datos_nacionales_2017_por_10000_ES.xlsx", data_only=True)
@@ -166,6 +168,7 @@ def main():
     print("Baja:", cont_baja)
     print()
 
+    #Ejercicio 4
     #repetimos con los datos del excel de 2023
     print("Ejercicio 4")
     #primero cargo los datos del excel a un diccionario
