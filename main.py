@@ -3,6 +3,27 @@ from ahpsortdos import prioridad_global, prioridad_local, calcular_provincias, c
 from openpyxl import load_workbook
 import csv
 
+def exportar_clasificacion(nombre_archivo, clasificacion):
+    equivalencias = {
+        "Alicante/Alacant": "Alacant/Alicante",
+        "Castellón/Castelló": "Castelló/Castellón",
+        "Valencia/València": "València/Valencia",
+        "Coruña (A)": "A Coruña",
+        "Coruña, A": "A Coruña",
+        "Balears (Illes)": "Illes Balears",
+        "Balears, Illes": "Illes Balears",
+        "Rioja (La)": "La Rioja",
+        "Rioja, La": "La Rioja",
+    }
+
+    with open(nombre_archivo, "w", newline="", encoding="utf-8") as archivo:
+        escritor = csv.writer(archivo)
+        escritor.writerow(["provincia", "puntuacion", "grupo"])
+
+        for provincia, resultado in clasificacion.items():
+            nombre_mapa = equivalencias.get(provincia, provincia)
+            escritor.writerow([nombre_mapa, resultado[0], resultado[1]])
+
 def main():
     #Ejercicio 1: Calcular los pesos de los criterios y calcular validez (CR concistencia)
     print("Ejercicio 1")
@@ -205,6 +226,11 @@ def main():
 
     for i in range(len(clases)):
         print(clases[i], "|", matriz_cambios[i][0], "|", matriz_cambios[i][1], "|", matriz_cambios[i][2])
+
+
+    #exportar las clasificaciones de 2017 y 2023
+    exportar_clasificacion("clasificacion_2017.csv", clasificacion_2017)
+    exportar_clasificacion("clasificacion_2023.csv", clasificacion_2023)
 
 if __name__ == "__main__":
     main()
