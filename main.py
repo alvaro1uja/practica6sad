@@ -64,6 +64,8 @@ def main():
     #Ejercicio 2
     #ahora repetir pero con los datos normalizados por los habitantes de cada provincia
     print()
+    print("###############################")
+    print()
     print("Ejercicio 2")
     habitantes = {
                 "Almeria": 731792,
@@ -112,6 +114,10 @@ def main():
 
     #Ejercicio 3
     #repetir el proceso pero ahora con los datos del excel de toda espana 2017
+    print()
+    print("###############################")
+    print()
+    
     print("Ejercicio 3")
     #primero abrimos el excel y cargamos sus datos en un diccionario
     archivo = load_workbook("Datos_nacionales_2017_por_10000_ES.xlsx", data_only=True)
@@ -146,12 +152,13 @@ def main():
     #ahora calculamos las prioridades globales de cada provincia de nuevo
     resultados_2017 = calcular_provincias(provincias_espana, expertos_pares_ej3, pesos)
     clasificacion_2017 = clasificar_provincias(lista_cps_ej3, resultados_2017)
-
-    print("Prioridades globales de cada provincia de España normalizadas por habitantes")
     mostrar_clasificacion(clasificacion_2017)
 
     #Ejercicio 4
     #repetimos con los datos del excel de 2023
+    print()
+    print("###############################")
+    print()
     print("Ejercicio 4")
     #primero cargo los datos del excel a un diccionario
     archivo = load_workbook("Datos_nacionales_2023_por_10000_ES.xlsx", data_only=True)
@@ -176,16 +183,28 @@ def main():
     mostrar_clasificacion(clasificacion_2023)
     
     #comparamos la clasificacion de 2017 y 2023 para ver si ha cambiado
-    print()
     print("Comparativa de clasificaciones entre 2017 y 2023")
     print("Provincia | Seguridad 2017 | Seguridad 2023")
+
+    clases = ["Alta", "Media", "Baja"]
+    matriz_cambios = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]  
 
     for provincia, resultado in clasificacion_2017.items():
         grupo_2017 = resultado[1]
         grupo_2023 = clasificacion_2023[provincia][1]
+
         print(provincia, "|", grupo_2017, "|", grupo_2023)
 
+        fila = clases.index(grupo_2017)
+        columna = clases.index(grupo_2023)
+        matriz_cambios[fila][columna] += 1
 
+    print()
+    print("Filas: 2017, Columnas: 2023")
+    print("Grupo | Alta | Media | Baja")
+
+    for i in range(len(clases)):
+        print(clases[i], "|", matriz_cambios[i][0], "|", matriz_cambios[i][1], "|", matriz_cambios[i][2])
 
 if __name__ == "__main__":
     main()
